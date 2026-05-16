@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="theme-color" content="#ffffff" />
+<title>PinPoint</title>
+<style>
+  /* Fonts */
+  
+  
+  
+  @font-face {
+    font-family: 'Roboto Mono';
+    src: url('fonts/Roboto_Mono/RobotoMono-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  *, *::before, *::after {
+    font-family: Montserrat, sans-serif; box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+    background: #ffffff;
+    color: #111;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overscroll-behavior-y: contain;
+  }
+
+  /* Page is constrained on desktop, full width on mobile */
+  .app {
+    width: 100%;
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Header */
+  .header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 16px 10px;
+    height: 56px;
+  }
+  .brand {
+    font-family: 'Montserrat', Georgia, serif;
+    font-weight: 300;
+    font-size: 28px;
+    letter-spacing: 0.2px;
+    color: #0e0e0e;
+    line-height: 1;
+  }
+
+  .scroll {
+    flex: 1;
+    overflow-y: auto;
+    /* tighter bottom space — buttons float over content */
+    padding: 6px 16px 88px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Hero collage card */
+  .hero {
+    border: 1px solid #ECECEC;
+    border-radius: 18px;
+    padding: 14px;
+    background: #fff;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.02);
+  }
+  .hero img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+
+  /* Section title */
+  .section-title {
+    margin: 18px 0 2px;
+    font-family: 'Montserrat', Georgia, serif;
+    font-size: 22px;
+    font-weight: 300;
+    color: #111;
+    letter-spacing: -0.1px;
+  }
+  .section-sub {
+    margin: 0 0 12px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    color: #3A815B;
+    font-weight: 500;
+  }
+
+  /* Product list */
+  .list { display: flex; flex-direction: column; gap: 10px; }
+  .product {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid #ECECEC;
+    border-radius: 14px;
+    padding: 12px;
+    background: #fff;
+    text-decoration: none;
+    color: inherit;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .product:active { background: #fafafa; }
+  .thumb {
+    flex: 0 0 56px;
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  /* Row wrapper: checkmark on the left + product on the right */
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .row > .product { flex: 1; min-width: 0; }
+  .check {
+    flex: 0 0 22px;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border-radius: 50%;
+    border: 1.5px solid #d4d4d4;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.18s ease, border-color 0.18s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .check::before {
+    content: '';
+    position: absolute;
+    inset: -10px;
+  }
+  .check svg {
+    width: 12px;
+    height: 12px;
+    color: #fff;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+  .row.selected .check {
+    background: #3A815B;
+    border-color: #3A815B;
+  }
+  .row.selected .check svg { opacity: 1; }
+  .info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  /* Item name = main title */
+  .product-name {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14.5px;
+    font-weight: 500;
+    color: #0e0e0e;
+    margin: 0 0 3px;
+    line-height: 1.2;
+  }
+  /* Brand row: small caps brand + Used/New tag */
+  .brand-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 4px;
+  }
+  .brand-name {
+    display: block;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    color: #9a9a9a;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    line-height: 1.2;
+    margin: 0 0 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .pill-green {
+    color: #3A815B;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+  }
+  .prices {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    color: #2b2b2b;
+    margin-bottom: 3px;
+    font-weight: 400;
+  }
+  .prices > span:not(.dot):not(.strike) { font-weight: 500; }
+  .prices .dot { color: #c2c2c2; font-weight: 400; }
+  .prices .strike { text-decoration: line-through; color: #8a8a8a; font-weight: 400; }
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    color: #8a8a8a;
+    font-weight: 400;
+  }
+  .chevron {
+    flex: 0 0 18px;
+    color: #b9b9b9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .chevron svg { width: 16px; height: 16px; }
+
+  /* Pricing summary */
+  .summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .summary-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid #ECECEC;
+    border-radius: 14px;
+    padding: 12px 14px;
+    background: #fff;
+  }
+  .tag-icon {
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #E8F1E5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #3A815B;
+  }
+  .tag-icon.dark {
+    background: #ECECEC;
+    color: #0e0e0e;
+  }
+  .tag-icon svg { width: 18px; height: 18px; }
+  .summary-text { display: flex; flex-direction: column; line-height: 1.1; }
+  .summary-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    color: #8a8a8a;
+    margin-bottom: 4px;
+    font-weight: 400;
+  }
+  .summary-value {
+    font-family: 'Montserrat', Georgia, serif;
+    font-size: 24px;
+    font-weight: 300;
+    color: #3A815B;
+    letter-spacing: 0.2px;
+    line-height: 1;
+  }
+  .summary-value.black { color: #0e0e0e; }
+
+  /* Floating summary that slides in while scrolling */
+  .floating-summary {
+    position: fixed;
+    left: 50%;
+    bottom: calc(72px + env(safe-area-inset-bottom));
+    z-index: 19;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 10px 20px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.62);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    font-family: 'Montserrat', sans-serif;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translate(-50%, 14px) scale(0.96);
+    transform-origin: bottom center;
+    pointer-events: none;
+    transition: opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform;
+  }
+  .floating-summary.visible {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+    pointer-events: auto;
+  }
+  .fs-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.05;
+  }
+  .fs-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+    font-weight: 400;
+    color: #8a8a8a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 3px;
+  }
+  .fs-value {
+    font-family: 'Montserrat', Georgia, serif;
+    font-weight: 300;
+    font-size: 18px;
+    color: #0e0e0e;
+    letter-spacing: 0.2px;
+    line-height: 1;
+  }
+  .fs-value.green { color: #3A815B; }
+  .fs-divider {
+    width: 1px;
+    height: 26px;
+    background: rgba(0, 0, 0, 0.10);
+  }
+
+  /* Footer — no background; buttons float individually */
+  .footer {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    padding: 8px 16px calc(6px + env(safe-area-inset-bottom));
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    border-top: 0;
+    box-shadow: none;
+    pointer-events: none; /* let touches fall through gaps */
+  }
+  .footer > * { pointer-events: auto; }
+
+  /* Glass back-pill (left of Shop items) */
+  .back-pill {
+    flex: 0 0 auto;
+    height: 56px;
+    width: 66px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #111;
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08), inset 0 0 0 0.5px rgba(255,255,255,0.4);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .back-pill svg { width: 28px; height: 28px; display: block; }
+
+  .btn {
+    flex: 1;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid transparent;
+    background: #fff;
+    color: #111;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-primary {
+    background: #0e0e0e;
+    color: #fff;
+    border-color: #0e0e0e;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
+  }
+  .btn-primary svg { color: #fff; width: 19px; height: 19px; }
+</style>
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="brand">Pinpoint</div>
+    </header>
+
+    <main class="scroll">
+      <section class="hero">
+        <img src="hero.png" alt="Outfit collage" />
+      </section>
+
+      <h2 class="section-title">Shop the look</h2>
+      <p class="section-sub">6 items</p>
+
+      <div class="list">
+        <div class="row selected" data-retail="118" data-pinpoint="40">
+        <button class="check" aria-label="Toggle selection"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></button>
+        <a class="product" href="https://www.depop.com/products/baileytoombs-vintage-ralph-lauren-sport-womens/">
+          <div class="thumb"><img src="p2_cardigan.png" alt="Cardigan"></div>
+          <div class="info">
+            <span class="brand-name">Polo Ralph Lauren</span>
+            <p class="product-name">Cable-Knit Cardigan</p>
+            <div class="prices"><span>$40</span><span class="dot">·</span><span class="strike">$118</span></div>
+            <div class="meta"><span>Depop</span><span class="dot">·</span><span class="pill-green">Used</span></div>
+          </div>
+          <div class="chevron">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </div>
+        </a>
+        </div>
+
+        <div class="row selected" data-retail="45" data-pinpoint="24">
+        <button class="check" aria-label="Toggle selection"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></button>
+        <a class="product" href="https://www.depop.com/products/dpamss-mango-mini-skirt-italian-fabric/?pla_feed=US&amp;utm_medium=Free%20Listings&amp;utm_campaign=FREELISTINGS_GG_US&amp;utm_channel=Google">
+          <div class="thumb"><img src="p3_skirt.png" alt="Skirt"></div>
+          <div class="info">
+            <span class="brand-name">Mango</span>
+            <p class="product-name">Cream and White Mini Skirt</p>
+            <div class="prices"><span>$24</span><span class="dot">·</span><span class="strike">$45</span></div>
+            <div class="meta"><span>Depop</span><span class="dot">·</span><span class="pill-green">New</span></div>
+          </div>
+          <div class="chevron">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </div>
+        </a>
+        </div>
+
+        <div class="row selected" data-retail="625" data-pinpoint="500">
+        <button class="check" aria-label="Toggle selection"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></button>
+        <a class="product" href="https://www.therealreal.com/products/women/shoes/flats/chanel-interlocking-cc-logo-leather-ballet-flats-u62ez">
+          <div class="thumb"><img src="p1_flats.png" alt="Ballet flats"></div>
+          <div class="info">
+            <span class="brand-name">Chanel</span>
+            <p class="product-name">Interlocking CC Logo Leather Ballet Flats</p>
+            <div class="prices"><span>$500</span><span class="dot">·</span><span class="strike">$625</span></div>
+            <div class="meta"><span>The RealReal</span><span class="dot">·</span><span class="pill-green">Used</span></div>
+          </div>
+          <div class="chevron">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </div>
+        </a>
+        </div>
+
+        <div class="row selected" data-retail="40" data-pinpoint="20">
+        <button class="check" aria-label="Toggle selection"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></button>
+        <a class="product" href="https://poshmark.com/listing/NEW-Rejolly-Cream-Crossbody-Bag-Pouch-Purse-Synthetic-Ostrich-Leather-69d7c7b7fe4c6854996a6765?com_cvv=8fb3d522dc163aeadb66e08cd7450cbbdddc64c6cf2e8891f6d48747c6d56d2c#utm_source=gdm_unpaid">
+          <div class="thumb"><img src="p5_case.png" alt="Cosmetic case"></div>
+          <div class="info">
+            <span class="brand-name">Rejolly</span>
+            <p class="product-name">The Essential Cosmetic Case</p>
+            <div class="prices"><span>$20</span><span class="dot">·</span><span class="strike">$40</span></div>
+            <div class="meta"><span>Poshmark</span><span class="dot">·</span><span class="pill-green">Used</span></div>
+          </div>
+          <div class="chevron">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </div>
+        </a>
+        </div>
+
+        <div class="row selected" data-retail="350" data-pinpoint="316">
+        <button class="check" aria-label="Toggle selection"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></button>
+        <a class="product" href="https://www.mercari.com/us/item/m13468668485/">
+          <div class="thumb"><img src="p4_sunglasses.png" alt="Sunglasses"></div>
+          <div class="info">
+            <span class="brand-name">Chanel</span>
+            <p class="product-name">Tortoiseshell Sunglasses</p>
+            <div class="prices"><span>$316</span><span class="dot">·</span><span class="strike">$350</span></div>
+            <div class="meta"><span>Mercari</span><span class="dot">·</span><span class="pill-green">Used</span></div>
+          </div>
+          <div class="chevron">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </div>
+        </a>
+        </div>
+
+        <div class="row selected" data-retail="5900" data-pinpoint="4900">
+        <button class="check" aria-label="Toggle selection"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></button>
+        <a class="product" href="https://www.betteridge.com/Cartier-Panth%C3%A8re-De-Cartier-Watch..-Small-Model..-Quartz-Movement..-Steel-WSPN0013/p/17311558">
+          <div class="thumb"><img src="p6_watch.png" alt="Cartier watch"></div>
+          <div class="info">
+            <span class="brand-name">Cartier</span>
+            <p class="product-name">Panthère Watch</p>
+            <div class="prices"><span>$4.9K</span><span class="dot">·</span><span class="strike">$5.9K</span></div>
+            <div class="meta"><span>Betteridge</span><span class="dot">·</span><span class="pill-green">Used</span></div>
+          </div>
+          <div class="chevron">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </div>
+        </a>
+        </div>
+      </div>
+
+      <section class="summary">
+        <div class="summary-card">
+          <div class="tag-icon dark">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+              <line x1="7" y1="7" x2="7.01" y2="7"></line>
+            </svg>
+          </div>
+          <div class="summary-text">
+            <span class="summary-label">Full look retail</span>
+            <span class="summary-value black">$7,053</span>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="tag-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+              <line x1="7" y1="7" x2="7.01" y2="7"></line>
+            </svg>
+          </div>
+          <div class="summary-text">
+            <span class="summary-label">With Phia</span>
+            <span class="summary-value">$5,800</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="floating-summary" aria-hidden="true">
+      <div class="fs-item">
+        <span class="fs-label">Retail</span>
+        <span class="fs-value fs-retail">$7,053</span>
+      </div>
+      <span class="fs-divider"></span>
+      <div class="fs-item">
+        <span class="fs-label">With Phia</span>
+        <span class="fs-value green fs-phia">$5,800</span>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <button class="back-pill" aria-label="Back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15.5 19 8.5 12 15.5 5"></polyline>
+        </svg>
+      </button>
+      <button class="btn btn-primary">
+        <span class="shop-text">Shop items</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="6" y1="18" x2="18" y2="6"></line>
+          <polyline points="9 6 18 6 18 15"></polyline>
+        </svg>
+      </button>
+    </footer>
+  </div>
+  <script>
+    (function () {
+      const rows = document.querySelectorAll('.row');
+      const staticRetail = document.querySelector('.summary-value.black');
+      const staticPhia = document.querySelector('.summary-card:last-child .summary-value');
+      const fsRetail = document.querySelector('.fs-retail');
+      const fsPhia = document.querySelector('.fs-phia');
+      const itemsLabel = document.querySelector('.section-sub');
+      const shopText = document.querySelector('.shop-text');
+      const fmt = n => '$' + n.toLocaleString('en-US');
+      const recalc = () => {
+        let r = 0, p = 0, count = 0;
+        rows.forEach(row => {
+          if (row.classList.contains('selected')) {
+            r += parseInt(row.dataset.retail, 10) || 0;
+            p += parseInt(row.dataset.pinpoint, 10) || 0;
+            count += 1;
+          }
+        });
+        const rText = fmt(r), pText = fmt(p);
+        staticRetail.textContent = rText;
+        staticPhia.textContent = pText;
+        fsRetail.textContent = rText;
+        fsPhia.textContent = pText;
+        itemsLabel.textContent = count + (count === 1 ? ' item' : ' items');
+        shopText.textContent = count === 1 ? 'Shop item' : 'Shop items';
+      };
+      rows.forEach(row => {
+        const check = row.querySelector('.check');
+        check.addEventListener('click', e => {
+          e.preventDefault();
+          row.classList.toggle('selected');
+          recalc();
+        });
+      });
+
+      // Scroll-driven floating summary
+      const scroller = document.querySelector('.scroll');
+      const floatBar = document.querySelector('.floating-summary');
+      const SHOW_AT = 24;
+      let visible = false;
+      const onScroll = () => {
+        const shouldShow = scroller.scrollTop > SHOW_AT;
+        if (shouldShow !== visible) {
+          visible = shouldShow;
+          floatBar.classList.toggle('visible', visible);
+          floatBar.setAttribute('aria-hidden', visible ? 'false' : 'true');
+        }
+      };
+      scroller.addEventListener('scroll', onScroll, { passive: true });
+    })();
+  </script>
+</body>
+</html>
